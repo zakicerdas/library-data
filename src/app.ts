@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
   const waktu = Date.now() - (req.startTime || 0);
-  res.json({ message: `Halo pemilik API Key: ${req.apiKey}! Hari 5 – MVC E-Commerce + Service`, waktu_proses: `${waktu}ms` });
+  res.json({ message: `Halo pemilik API Key: ${req.apiKey}! selamat datang library data simple`, waktu_proses: `${waktu}ms` });
 });
 
 app.use('/api', productRoutes);
