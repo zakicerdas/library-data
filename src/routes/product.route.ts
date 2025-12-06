@@ -6,9 +6,9 @@ import {
     updateProduct,
     deleteProduct,
     searchProducts
- } from "../controllers/product.controller";
+ } from "../controllers/libraryController";
 
-import { validate, createProductValidation } from "../middlewares/product.validation";
+import { validate, createProductValidation } from "../middlewares/library.validation";
 
 const router = Router();
 
