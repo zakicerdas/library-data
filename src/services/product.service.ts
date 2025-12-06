@@ -37,7 +37,7 @@ export class ProductService {
         products.splice(index, 1);
     }
 
-static searchProducts(name?: string, maxPrice?: number, category?: string): Product[] {
+static searchProducts(name?: string, maxPrice?: number, category?: string, sortBy?: 'name' | 'price', sortOrder?: 'asc' | 'desc'): Product[] {
     let filteredProducts = products;
 
     if (name) {
@@ -54,6 +54,16 @@ static searchProducts(name?: string, maxPrice?: number, category?: string): Prod
         filteredProducts = filteredProducts.filter(p => 
             p.category?.toLowerCase() === category.toLowerCase()
         );
+    }
+
+    if (sortBy && (sortBy === 'name' || sortBy === 'price')) {
+        filteredProducts.sort((a, b) => {
+            const aValue = sortBy === 'name' ? a.name : a.price;
+            const bValue = sortBy === 'name' ? b.name : b.price;
+            
+            const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+            return sortOrder === 'desc' ? -comparison : comparison;
+        });
     }
     return filteredProducts;
 }

@@ -32,11 +32,13 @@ export const deleteProduct = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const searchProducts = asyncHandler(async (req: Request, res: Response) => {
-  const { name, max_price, category } = req.query;
+  const { name, max_price, category, sortBy, sortOrder } = req.query;
   const products = ProductService.searchProducts(
     name as string, 
     max_price ? Number(max_price) : undefined,
-    category as string
+    category as string,
+    sortBy as 'name' | 'price',
+    sortOrder as 'asc' | 'desc'
     
 
   );
