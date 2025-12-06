@@ -7,15 +7,22 @@ export interface Product {
     stock?: number;
 }
 
-export const PRODUCTS_CATEGORIES = ['Electronics', 'Books', 'Clothing', 'Home', 'Sports'];
+export const PRODUCTS_CATEGORIES = ['Isekai', 'Virtual Reality', 'Fantasy', 'Psychological', 'Fantasy Romance', 'Dark Fantasy', 'Romantic Comedy'];
 
 export let products: Product[] = [
-  { id: 1, name: 'Laptop', price: 1500, description: 'A high-performance laptop', category: 'Electronics', stock: 10 },
-  { id: 2, name: 'Smartphone', price: 800, description: 'A latest model smartphone', category: 'Electronics', stock: 25 },
-  { id: 3, name: 'Novel Book', price: 20, description: 'A best-selling novel', category: 'Books', stock:12 },
-  { id: 4, name: 'T-Shirt', price: 15, description: 'A comfortable cotton t-shirt', category: 'Clothing', stock: 50 },
-  { id: 5, name: 'Blender', price: 100, description: 'A kitchen blender', category: 'Home', stock: 8 },
-  { id: 6, name: 'Football', price: 30, description: 'A professional football', category: 'Sports', stock: 20 },
-  { id: 7, name: 'Headphones', price: 200, description: 'Noise-cancelling headphones', category: 'Electronics', stock: 0 },
-  { id: 8, name: 'Cookbook', price: 25, description: 'A cookbook with healthy recipes', category: 'Books', stock: 9 },
+ { id: 1, name: 'Re:Zero -Starting Life in Another World- Volume 1', price: 12.99, description: 'A story about a boy transported to a fantasy world, who discovers he has the power to return from death.', category: 'Isekai', stock: 25 },
+
+{ id: 2, name: 'Sword Art Online: Aincrad', price: 14.50, description: 'Players become trapped in a virtual reality MMORPG, where death in the game means death in real life.', category: 'Virtual Reality', stock: 18 },
+
+{ id: 3, name: 'The Rising of the Shield Hero Volume 1', price: 13.25, description: 'A young man is summoned as one of four legendary heroes, only to be betrayed and must rise from the lowest station.', category: 'Fantasy', stock: 15 },
+
+{ id: 4, name: 'Classroom of the Elite Volume 1', price: 11.99, description: 'A seemingly average student navigates the intricate social hierarchies and secret competition of a prestigious high school.', category: 'Psychological', stock: 22 },
+
+{ id: 5, name: 'That Time I Got Reincarnated as a Slime Volume 1', price: 12.75, description: 'A corporate worker is reincarnated as a slime in a fantasy world, gaining unique powers and building a nation of monsters.', category: 'Isekai', stock: 30 },
+
+{ id: 6, name: 'Spice and Wolf Volume 1', price: 16.00, description: 'A traveling merchant forms an unlikely partnership with a wise wolf deity in the form of a young girl.', category: 'Fantasy Romance', stock: 12 },
+
+{ id: 7, name: 'Overlord Volume 1: The Undead King', price: 13.99, description: 'A player decides to stay in a virtual game world as his powerful overlord character after it shuts down.', category: 'Dark Fantasy', stock: 20 },
+
+{ id: 8, name: 'My Youth Romantic Comedy Is Wrong, As I Expected Volume 1', price: 11.50, description: 'A cynical high school loner is forced to join a club that helps students with their problems.', category: 'Romantic Comedy', stock: 28 }
 ];

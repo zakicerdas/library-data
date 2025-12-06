@@ -6,7 +6,7 @@ export class ProductService {
     }
     static getProductById(id: number): Product | undefined {
         const product = products.find(p => p.id === id);
-        if (!product) throw new Error('Product not found');
+        if (!product) throw new Error('Book not found');
         return product;
         
     }
@@ -23,7 +23,7 @@ export class ProductService {
     static updateProduct(id: number, data: Partial<Product>): Product {
         const index = products.findIndex(p => p.id === id);
         if (index === -1) {
-            throw new Error('Product not found');
+            throw new Error('Book not found');
         }
         products[index] = { ...products[index], ...data };
         return products[index];
@@ -32,7 +32,7 @@ export class ProductService {
     static deleteProduct(id: number): void {
         const index = products.findIndex(p => p.id === id);
         if (index === -1) {
-            throw new Error('Product not found');
+            throw new Error('Book not found');
         }
         products.splice(index, 1);
     }
