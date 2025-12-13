@@ -1,46 +1,41 @@
-import { Request, Response } from 'express';
-import { ProductService } from '../services/product.service';
+import type { Request, Response } from 'express';
+import * as ProductService from '../services/product.service';
 import { asyncHandler } from '../utils/async.handler';
 import { successResponse } from '../utils/response';
 
-export const getAllProducts = asyncHandler(async (req: Request, res: Response) => {
-  const products = ProductService.getAllProducts();
-  return successResponse(res, 'product list', products);
+export const getAllProducts = asyncHandler(async (_req: Request, res: Response) => {
+  const products = await ProductService.getAllProducts();
+  return successResponse(res, 'Daftar produk', products);
 });
 
 export const getProductById = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const product = ProductService.getProductById(id);
-  return successResponse(res, 'Product founded', product);
+  const id = req.params.id; 
+  const product = await ProductService.getProductById(id as string);
+  return successResponse(res, 'Produk ditemukan', product);
 });
 
 export const createProduct = asyncHandler(async (req: Request, res: Response) => {
-  const product = ProductService.createProduct(req.body);
-  return successResponse(res, 'Product created succesfully', product, null, 201);
+  const product = await ProductService.createProduct(req.body);
+  return successResponse(res, 'Produk berhasil ditambahkan', product, null, 201);
 });
 
 export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const product = ProductService.updateProduct(id, req.body);
-  return successResponse(res, 'Product update succesfully', product);
+  const id = req.params.id; 
+  const product = await ProductService.updateProduct(id as string, req.body);
+  return successResponse(res, 'Produk berhasil diupdate', product);
 });
 
 export const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const product = ProductService.deleteProduct(id);
-  return successResponse(res, 'Product deleted succesfully', product);
+  const id = req.params.id;  
+  const product = await ProductService.deleteProduct(id as string);
+  return successResponse(res, 'Produk berhasil dihapus', product);
 });
 
 export const searchProducts = asyncHandler(async (req: Request, res: Response) => {
-  const { name, max_price, category, sortBy, sortOrder } = req.query;
-  const products = ProductService.searchProducts(
+  const { name, max_price } = req.query;
+  const products = await ProductService.searchProducts(
     name as string, 
-    max_price ? Number(max_price) : undefined,
-    category as string,
-    sortBy as 'name' | 'price',
-    sortOrder as 'asc' | 'desc'
-    
-
+    max_price ? Number(max_price) : undefined
   );
-  return successResponse(res, 'search results', products);
+  return successResponse(res, 'Hasil pencarian', products);
 });

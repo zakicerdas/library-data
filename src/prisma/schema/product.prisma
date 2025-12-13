@@ -1,0 +1,23 @@
+model Product {
+   id         String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  
+  // === TAMBAHAN RELASI ===
+  categoryId  String?     // Foreign Key
+  category    Category? @relation(fields: [categoryId], references: [id])
+  // =======================
+
+  // RELASI KE AUTHOR (SAMA POLANYA)
+  authorId    String?
+  author      Author? @relation(fields: [authorId], references: [id])
+  // =======================
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@map("products")
+}

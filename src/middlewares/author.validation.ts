@@ -21,29 +21,18 @@ export const validate = (validations: ValidationChain[]) => {
   };
 };
 
-export const createProductValidation = [
+export const createAuthorValidation = [
   body('name')
     .trim()
-    .notEmpty().withMessage('Nama produk wajib diisi')
-    .isLength({ min: 3 }).withMessage('Nama produk minimal 3 karakter'),
-  
-  body('description')
+    .notEmpty().withMessage('Nama Author wajib diisi')
+    .isLength({ min: 3 }).withMessage('Nama Author minimal 3 karakter'),
+    body('email')
     .trim()
-    .optional()
-    .isLength({ min: 10 }).withMessage('Deskripsi minimal 10 karakter jika diisi'),
-  
-  body('price')
-    .notEmpty().withMessage('Harga wajib diisi')
-    .isNumeric().withMessage('Harga harus angka')
-    .custom((value: number) => value > 0).withMessage('Harga harus lebih dari 0'),
-  
-  body('stock')
-    .notEmpty().withMessage('Stok wajib diisi')
-    .isNumeric().withMessage('Stok harus angka')
-    .custom((value: number) => value >= 0).withMessage('Stok tidak boleh negatif')
+    .notEmpty().withMessage('Email Author wajib diisi')
+    .isEmail().withMessage('Email tidak valid'),
 ];
 
-export const getProductByIdValidation = [
+export const getAuthorByIdValidation = [
   param('id')
     .notEmpty().withMessage('ID harus diisi')
 ];
