@@ -2,7 +2,6 @@ import { body, param, validationResult, type ValidationChain } from 'express-val
 import type { Request, Response, NextFunction } from 'express';
 import { errorResponse } from '../utils/response';
 
-// Helper function untuk menjalankan validasi
 export const validate = (validations: ValidationChain[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     await Promise.all(validations.map(validation => validation.run(req)));
@@ -31,7 +30,15 @@ export const createProductValidation = [
     .trim()
     .optional()
     .isLength({ min: 10 }).withMessage('Deskripsi minimal 10 karakter jika diisi'),
-  
+
+   body('image')
+    .custom((_value, { req }) => {
+      if (!req.file) {
+        throw new Error('Gambar wajib diisi');
+      }
+      return true;
+    }),
+
   body('price')
     .notEmpty().withMessage('Harga wajib diisi')
     .isNumeric().withMessage('Harga harus angka')
