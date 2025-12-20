@@ -7,5 +7,8 @@ model Author {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
- @@map("author")
+   userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+ @@map("authors")
 }
