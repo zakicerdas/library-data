@@ -10,7 +10,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         return res.status(401).json({ success: false, message: 'Token tidak ditemukan' });
     }
 
-    const token = authHeader.split(' ')[1]; // Format: "Bearer <token>"
+    const token = authHeader.split(' ')[1]; 
 
     if (!token) {
         return res.status(401).json({ success: false, message: 'Format token salah' });
