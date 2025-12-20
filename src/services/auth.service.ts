@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_kunci_rahasia';
 
-export const register = async (data: { name: string; email: string; password: string, role?: string }) => {
+export const register = async (data: { username: string; email: string; password: string, role?: string }) => {
   const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
   if (existingUser) {
     throw new Error('Email sudah terdaftar');
@@ -14,7 +14,7 @@ export const register = async (data: { name: string; email: string; password: st
 
   return await prisma.user.create({
     data: {
-      username: data.name,
+      username: data.username,
       email: data.email,
       password: hashedPassword,
       role: data.role || 'USER',

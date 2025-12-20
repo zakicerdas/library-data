@@ -59,7 +59,7 @@ export const createProduct = async (data: {
   stock: number;
   description?: string;
   categoryId?: string;
-  storeId?: string; 
+  authorId?: string; 
   image: string;
 }): Promise<Product> => {
   const productData = {
@@ -69,7 +69,7 @@ export const createProduct = async (data: {
     stock: data.stock,
     image: data.image,
     categoryId: data.categoryId ?? null,
-    storeId: data.storeId ?? null
+    authorId: data.authorId ?? null
   };
   
   return await productRepo.createProduct(productData);
