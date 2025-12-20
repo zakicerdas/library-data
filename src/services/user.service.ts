@@ -27,9 +27,11 @@ export const getAllUsers = async (params: FindAllParams): Promise<UserListRespon
   };
 
   if (search) {
-    whereClause.name = { contains: search, mode: 'insensitive' };
+    whereClause.OR = [
+      { username: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } }
+    ];
   }
-
   const orderBy = sortBy ? { [sortBy]: sortOrder || 'desc' } : { createdAt: 'desc' } as const;
 
   const users = await userRepo.findAllUsers(skip, limit, whereClause, orderBy);
@@ -54,11 +56,11 @@ export const getUserById = async (id: string): Promise<User> => {
   return user;
 };
 
-export const createUser = async (data: { name: string; email: string; password: string }): Promise<User> => {
+export const createUser = async (data: { username: string; email: string; password: string }): Promise<User> => {
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
   const userData = {
-    username: data.name,
+    username: data.username,
     email: data.email,
     password: hashedPassword,
   };

@@ -19,7 +19,7 @@ export const successResponse = (
   res: Response,
   message: string,
   data: unknown = null,
-  pagination: { page: number; limit: number; total: number } | null = null,
+  pagination: { page: number; limit: number; total: number; pages: number } | null = null,
   statusCode: number = 200
 ) => {
   const response: ApiResponse = {
