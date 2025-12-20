@@ -3,38 +3,50 @@ import * as authorService from '../services/author.service';
 import { asyncHandler } from '../utils/async.handler';
 import { successResponse } from '../utils/response';
 
-export const getAllAuthor = asyncHandler(async (_req: Request, res: Response) => {
-  const stores = await authorService.getAllAuthor();
-  return successResponse(res, 'Daftar author', stores);
+export const getAllAuthors = asyncHandler(async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const search = req.query.search as string;
+  const sortBy = req.query.sortBy as string;
+  const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
+
+  const result = await authorService.getAllAuthors({
+    page,
+    limit,
+    search,
+    sortBy,
+    sortOrder
+  });
+
+  const totalPages = Math.ceil(result.total / limit);
+
+  return successResponse(res, 'Daftar penulis berhasil diambil', result.data, {
+    page: result.page,
+    limit: result.limit,
+    total: result.total,
+    pages: totalPages 
+  });
 });
 
 export const getAuthorById = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
   const author = await authorService.getAuthorById(id as string);
-  return successResponse(res, 'author ditemukan', author);
+  return successResponse(res, 'penulis ditemukan', author);
 });
 
 export const createAuthor = asyncHandler(async (req: Request, res: Response) => {
-  const store = await authorService.createAuthor(req.body);
-  return successResponse(res, 'author berhasil ditambahkan', store, null, 201);
+  const author = await authorService.createAuthor(req.body);
+  return successResponse(res, 'penulis berhasil ditambahkan', author, null, 201);
 });
 
 export const updateAuthor = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
   const author = await authorService.updateAuthor(id as string, req.body);
-  return successResponse(res, 'author berhasil diupdate', author);
+  return successResponse(res, 'penulis berhasil diupdate', author);
 });
 
 export const deleteAuthor = asyncHandler(async (req: Request, res: Response) => {
   const id = req.params.id;
   const author = await authorService.deleteAuthor(id as string);
-  return successResponse(res, 'author berhasil dihapus', author);
-});
-
-export const searchAuthor = asyncHandler(async (req: Request, res: Response) => {
-  const { name } = req.query;
-  const author = await authorService.searchAuthor(
-    name as string, 
-  );
-  return successResponse(res, 'Hasil pencarian', author);
+  return successResponse(res, 'penulis berhasil dihapus', author);
 });
