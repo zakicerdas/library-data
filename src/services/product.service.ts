@@ -1,7 +1,7 @@
-import type { Product } from '../generated/client';
-import * as productRepo from '../repositories/product.repository';
+import { ProductRepository } from '../repositories/product.repository';
+import type { Prisma } from '../generated/client';
 
-interface FindAllParams {
+interface findAllParams {
   page: number;
   limit: number;
   search?: string;
@@ -9,79 +9,94 @@ interface FindAllParams {
   sortOrder?: 'asc' | 'desc';
 }
 
-interface ProductListResponse {
-  data: Product[];
-  total: number;
-  pages: number;
-  page: number;  
-  limit: number;
+export class getAllProductsService {
+  constructor(private productRepo: ProductRepository) { }
+
+  async execute(params: findAllParams) {
+    const { page, limit, search, sortBy, sortOrder } = params;
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.ProductWhereInput = {
+      deletedAt: null,
+    };
+
+    if (search) {
+      whereClause.name = { contains: search, mode: 'insensitive' };
+    }
+
+    const sortCriteria: any = sortBy ? { [sortBy]: sortOrder || 'desc' } : { createdAt: 'desc' };
+
+    const products = await this.productRepo.findAll(skip, limit, whereClause, sortCriteria);
+    const totalItems = await this.productRepo.countAll(whereClause);
+
+    return {
+      products,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page
+    };
+  }
 }
 
-export const getAllProducts = async (params: FindAllParams): Promise<ProductListResponse> => {
-  const { page, limit, search, sortBy, sortOrder } = params;
-  const skip = (page - 1) * limit;
+export class getProductByIdService {
+  constructor(private productRepo: ProductRepository) { }
 
-  const whereClause: any = {
-    deletedAt: null 
-  };
-
-  if (search) {
-    whereClause.name = { contains: search, mode: 'insensitive' };
+  async execute(id: string) {
+    const product = await this.productRepo.findById(id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    return product;
   }
+}
 
-  const orderBy = sortBy ? { [sortBy]: sortOrder || 'desc' } : { createdAt: 'desc' } as const;
+export class createProductService {
+  constructor(private productRepo: ProductRepository) { }
 
-  const products = await productRepo.findAllProducts(skip, limit, whereClause, orderBy);
-  const totalItems = await productRepo.countProducts(whereClause);
-
-  return {
-    data: products,
-    total: totalItems,
-    pages: Math.ceil(totalItems / limit),
-    page: page, 
-    limit: limit 
-  };
-};
-
-export const getProductById = async (id: string): Promise<Product> => {
-  const product = await productRepo.findProductById(id);
-  
-  if (!product) {
-    throw new Error('Product not found');
+  async execute(data: {
+    name: string;
+    price: number;
+    stock: number;
+    description?: string;
+    categoryId: string;
+    storeId?: string;
+    image?: string;
+  }) {
+    const createData: Prisma.ProductCreateInput = {
+      name: data.name,
+      description: data.description ?? null,
+      price: data.price,
+      stock: data.stock,
+      image: data.image ?? null,
+      category: {
+        connect: { id: data.categoryId }
+      }
+    };
+    return await this.productRepo.create(createData);
   }
-  
-  return product;
-};
+}
 
-export const createProduct = async (data: { 
-  name: string; 
-  price: number; 
-  stock: number;
-  description?: string;
-  categoryId?: string;
-  authorId?: string; 
-  image: string;
-}): Promise<Product> => {
-  const productData = {
-    name: data.name,
-    description: data.description ?? null,
-    price: data.price,
-    stock: data.stock,
-    image: data.image,
-    categoryId: data.categoryId ?? null,
-    authorId: data.authorId ?? null
-  };
-  
-  return await productRepo.createProduct(productData);
-};
 
-export const updateProduct = async (id: string, data: Partial<Product>): Promise<Product> => {
-  await getProductById(id);
+export class updateProductService {
+  constructor(private productRepo: ProductRepository) { }
 
-  return await productRepo.updateProduct(id, data);
-};
+  async execute(id: string, data: any) {
+    const product = await this.productRepo.findById(id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    return await this.productRepo.update(id, data);
+  }
+}
 
-export const deleteProduct = async (id: string): Promise<Product> => {
-  await getProductById(id);
-  return await productRepo.softDeleteProduct(id);
-};
+export class deleteProductService {
+  constructor(private productRepo: ProductRepository) { }
+
+  async execute(id: string) {
+    const product = await this.productRepo.findById(id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    return await this.productRepo.softDelete(id);
+  }
+}
