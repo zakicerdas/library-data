@@ -1,7 +1,6 @@
-import * as authorRepo from "../repositories/author.repository";
-import type { Author } from "../generated/client";
+import { AuthorRepository } from '../repositories/author.repository';
 
-interface FindAllParams {
+interface findAllParams {
   page: number;
   limit: number;
   search?: string;
@@ -9,68 +8,92 @@ interface FindAllParams {
   sortOrder?: 'asc' | 'desc';
 }
 
-interface AuthorListResponse {
-    data: Author[];
-  total: number;
-  pages: number;
-  page: number;  
-  limit: number;
-}
+export class getAllAuthorsService {
+  constructor(private authorRepo: AuthorRepository) { }
 
-export const getAllAuthors = async (params: FindAllParams): Promise<AuthorListResponse> => {
-  const { page, limit, search, sortBy, sortOrder } = params;
+  async execute(params: findAllParams) {
+    const { page, limit, search, sortBy, sortOrder } = params;
+    const skip = (page - 1) * limit;
 
-  const skip = (page - 1) * limit;
-
-  const whereClause: any = {
-    deletedAt: null 
-  };
-
-  if (search) {
-    whereClause.name = { contains: search, mode: 'insensitive' };
-  }
-
-   const orderBy = sortBy ? { [sortBy]: sortOrder || 'desc' } : { createdAt: 'desc' } as const;
-
-    const authors = await authorRepo.findAllAuthors(skip, limit, whereClause, orderBy);
-    const totalItems = await authorRepo.countAuthors(whereClause);
-
-    return {
-      data: authors,
-      total: totalItems,
-      pages: Math.ceil(totalItems / limit),
-      page: page, 
-      limit: limit 
+    const whereClause: any = {
+      deletedAt: null,
     };
-};
 
-export const getAuthorById = async (id: string): Promise<Author> => {
-    const author = await authorRepo.findAuthorById(id);
-    
-    if (!author) {
-        throw new Error('Author not found');
+    if (search) {
+      whereClause.name = { contains: search, mode: 'insensitive' };
     }
 
-    return author;
-};
+    const sortCriteria: any = sortBy ? { [sortBy]: sortOrder || 'desc' } : { createdAt: 'desc' };
 
-export const createAuthor = async (data: { name: string; email: string; address: string; userId: string }): Promise<Author> => {
-    const authorData = { 
-        name: data.name,
-        email: data.email,
-        address: data.address,
-        user: { connect: { id: data.userId } }
+    const authors = await this.authorRepo.findAll(skip, limit, whereClause, sortCriteria);
+    const totalItems = await this.authorRepo.countAll(whereClause);
+
+    return {
+      authors,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page
     };
-    return await authorRepo.createAuthor(authorData);
-};
+  }
+}
 
-export const updateAuthor = async (id: string, data: Partial<Author>): Promise<Author> => {
-    await getAuthorById(id);
-    return await authorRepo.updateAuthor(id, data);
-};
+export class getAuthorByIdService {
+  constructor(private authorRepo: AuthorRepository) { }
 
-export const deleteAuthor = async (id: string): Promise<Author> => {
-    await getAuthorById(id);
+  async execute(id: string) {
+    const author = await this.authorRepo.findById(id);
+    if (!author) {
+      throw new Error('Author not found');
+    }
+    return author;
+  }
+}
 
-    return await authorRepo.softDeleteAuthor(id);
-};
+export class createAuthorService {
+  constructor(private authorRepo: AuthorRepository) { }
+
+  async execute(data: {
+    name: string;
+    email?: string;
+    address?: string;
+    userId: string;
+  }) {
+    const createData: any = {
+      name: data.name,
+      email: data.email || undefined,
+      address: data.address || undefined,
+      userId: data.userId,
+    };
+    return await this.authorRepo.create(createData);
+  }
+}
+
+export class updateAuthorService {
+  constructor(private authorRepo: AuthorRepository) { }
+  async execute(id: string, data: any) {
+    const author = await this.authorRepo.findById(id);
+    if (!author) {
+      throw new Error('Author not found');
+    }
+    
+    const updateData: any = {
+      name: data.name || undefined,
+      email: data.email || undefined,
+      address: data.address || undefined,
+    };
+    
+    return await this.authorRepo.update(id, updateData);
+  }
+}
+
+export class deleteAuthorService {
+  constructor(private authorRepo: AuthorRepository) { }
+
+  async execute(id: string) {
+    const author = await this.authorRepo.findById(id);
+    if (!author) {
+      throw new Error('Author not found');
+    }
+    return await this.authorRepo.softDelete(id);
+  }
+}

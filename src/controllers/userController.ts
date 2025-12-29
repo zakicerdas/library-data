@@ -1,57 +1,80 @@
-// userController.ts (versi rapi)
 import type { Request, Response } from 'express';
-import * as UserService from '../services/user.service';
-import type { User } from '../generated/client';
+import {
+  createUserService,
+  deleteUserService,
+  getAllUsersService,
+  getUserByIdService,
+  updateUserService
+} from '../services/user.service';
 import { asyncHandler } from '../utils/async.handler';
-import { successResponse, errorResponse } from '../utils/response'; // ⬅️ tambah errorResponse
+import { successResponse } from '../utils/response';
 
-export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const search = req.query.search as string;
-  const sortBy = req.query.sortBy as string;
-  const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
+export class UserController {
+  constructor(
+    private getAllUsersSvc: getAllUsersService,
+    private getUserByIdSvc: getUserByIdService,
+    private createUserSvc: createUserService,
+    private updateUserSvc: updateUserService,
+    private deleteUserSvc: deleteUserService
+  ) { }
 
-  const result = await UserService.getAllUsers({
-    page,
-    limit,
-    search,
-    sortBy,
-    sortOrder
+  getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const search = req.query.search as string;
+    const sortBy = req.query.sortBy as string;
+    const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
+
+    const result = await this.getAllUsersSvc.execute({
+      page,
+      limit,
+      search,
+      sortBy,
+      sortOrder
+    });
+
+    const pagination = {
+      page: result.currentPage,
+      limit: limit,
+      total: result.totalItems,
+      totalPages: result.totalPages
+    };
+
+    return successResponse(res, 'Daftar user berhasil diambil', result.users, pagination);
   });
 
-  return successResponse(res, 'Daftar user berhasil diambil', result.data, {
-    page: result.page,
-    limit: result.limit,
-    total: result.total,
-    pages: result.pages 
+  getUserById = asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const user = await this.getUserByIdSvc.execute(id as string);
+    return successResponse(res, 'User ditemukan', user);
   });
-});
 
+  createUser = asyncHandler(async (req: Request, res: Response) => {
+    const userData = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    };
 
+    const user = await this.createUserSvc.execute(userData);
+    return successResponse(res, 'User berhasil ditambahkan', user, null, 201);
+  });
 
-export const getUserById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  
-  const user = await UserService.getUserById(id as string);
-  return successResponse(res, 'User retrieved successfully', user);
-});
+  updateUser = asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const userData: any = {
+      name: req.body.name || undefined,
+      email: req.body.email || undefined,
+      password: req.body.password || undefined
+    };
 
-export const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const updateData: Partial<User> = req.body;
-  
-  if (Object.keys(updateData).length === 0) {
-    return errorResponse(res, 'No data provided for update', 400);
-  }
+    const user = await this.updateUserSvc.execute(id as string, userData);
+    return successResponse(res, 'User berhasil diupdate', user);
+  });
 
-  const updatedUser = await UserService.updateUser(id as string, updateData);
-  return successResponse(res, 'User updated successfully', updatedUser);
-});
-
-export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  
-  const deletedUser = await UserService.deleteUser(id as string);
-  return successResponse(res, 'User soft deleted successfully', deletedUser);
-});
+  deleteUser = asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const user = await this.deleteUserSvc.execute(id as string);
+    return successResponse(res, 'User berhasil dihapus', user);
+  });
+}

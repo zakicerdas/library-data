@@ -38,6 +38,20 @@ export class getAllProductsService {
   }
 }
 
+export class getProductStatsService {
+  constructor(private productRepo: ProductRepository) { }
+
+async execute(categoryId?: string) {
+  const stats = await this.productRepo.getStatistics(categoryId);
+  const categoryStats = await this.productRepo.getProductsByCategoryStats(categoryId); // Teruskan kemari
+  
+  return {
+    overview: stats,
+    byCategory: categoryStats
+  };
+}
+}
+
 export class getProductByIdService {
   constructor(private productRepo: ProductRepository) { }
 
@@ -59,7 +73,6 @@ export class createProductService {
     stock: number;
     description?: string;
     categoryId: string;
-    storeId?: string;
     image?: string;
   }) {
     const createData: Prisma.ProductCreateInput = {

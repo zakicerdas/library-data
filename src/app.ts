@@ -10,6 +10,8 @@ import transactionRoutes from './routes/transaction.route';
 import authenticateRoutes from './routes/auth.route'
 import userRoutes from './routes/user.route'
 import profileRoutes from './routes/profile.route';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './utils/swagger'; 
 
 const app = express();
 
@@ -17,21 +19,15 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.startTime = Date.now();
-  const apiKey = req.headers['x-api-key'] as string;
-  if (!apiKey) return res.status(401).json({ success: false, message: 'Kirim header X-API-Key' });
-  req.apiKey = apiKey;
-  next();
-});
 
-// Routes
-app.get('/', (req, res) => {
-  const waktu = Date.now() - (req.startTime || 0);
-  res.json({ message: `Halo pemilik API Key: ${req.apiKey}!`, waktu_proses: `${waktu}ms` });
-});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.get('/', (_req, res) => {
+  res.redirect('/api-docs');
+}
+);
 
 app.use('/api/v1', userRoutes)
 app.use('/api/v1', productRoutes);
@@ -40,7 +36,6 @@ app.use('/api/v1', authorRoutes);
 app.use('/api/v1', transactionRoutes);
 app.use('/api/v1', authenticateRoutes);
 app.use('/api/v1', profileRoutes);
-
 
 app.use(errorHandler);
 
