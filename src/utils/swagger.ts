@@ -4,9 +4,9 @@ const options: swaggerJsdoc.Options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'E-Commerce API Documentation',
+            title: 'library-data Documentation',
             version: '1.0.0',
-            description: 'Dokumentasi lengkap API E-Commerce',
+            description: 'Dokumentasi lengkap API library-data',
             contact: {
                 name: 'Backend Developer',
             },
